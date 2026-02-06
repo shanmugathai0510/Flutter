@@ -1,0 +1,175 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const StudentApp());
+}
+
+class StudentApp extends StatelessWidget {
+  const StudentApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Student Management System',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const StudentHomePage(),
+    );
+  }
+}
+
+// ------------------ Student Model ------------------
+class Student {
+  String name;
+  String rollNo;
+  String department;
+
+  Student({
+    required this.name,
+    required this.rollNo,
+    required this.department,
+  });
+}
+
+// ------------------ Home Page ------------------
+class StudentHomePage extends StatefulWidget {
+  const StudentHomePage({super.key});
+
+  @override
+  State<StudentHomePage> createState() => _StudentHomePageState();
+}
+
+class _StudentHomePageState extends State<StudentHomePage> {
+  final List<Student> students = [];
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController rollController = TextEditingController();
+  final TextEditingController deptController = TextEditingController();
+
+  void _addOrEditStudent({Student? student, int? index}) {
+    if (student != null) {
+      nameController.text = student.name;
+      rollController.text = student.rollNo;
+      deptController.text = student.department;
+    } else {
+      nameController.clear();
+      rollController.clear();
+      deptController.clear();
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(student == null ? "Add Student" : "Edit Student"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: "Student Name"),
+            ),
+            TextField(
+              controller: rollController,
+              decoration: const InputDecoration(labelText: "Roll Number"),
+            ),
+            TextField(
+              controller: deptController,
+              decoration: const InputDecoration(labelText: "Department"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (nameController.text.isEmpty ||
+                  rollController.text.isEmpty ||
+                  deptController.text.isEmpty) {
+                return;
+              }
+
+              setState(() {
+                if (student == null) {
+                  students.add(Student(
+                    name: nameController.text,
+                    rollNo: rollController.text,
+                    department: deptController.text,
+                  ));
+                } else {
+                  students[index!] = Student(
+                    name: nameController.text,
+                    rollNo: rollController.text,
+                    department: deptController.text,
+                  );
+                }
+              });
+
+              Navigator.pop(context);
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteStudent(int index) {
+    setState(() {
+      students.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Student Management System"),
+        centerTitle: true,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _addOrEditStudent(),
+        child: const Icon(Icons.add),
+      ),
+      body: students.isEmpty
+          ? const Center(
+              child: Text(
+                "No Student Records",
+                style: TextStyle(fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              itemCount: students.length,
+              itemBuilder: (context, index) {
+                final student = students[index];
+                return Card(
+                  margin: const EdgeInsets.all(8),
+                  child: ListTile(
+                    title: Text(student.name),
+                    subtitle: Text(
+                      "Roll: ${student.rollNo}\nDept: ${student.department}",
+                    ),
+                    isThreeLine: true,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () =>
+                              _addOrEditStudent(student: student, index: index),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteStudent(index),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
