@@ -1,0 +1,48 @@
+import 'package:flutter/material.dart';
+
+void main() {
+
+runApp(const MainApp());
+
+}
+
+class MainApp extends StatelessWidget {
+
+const MainApp({super.key});
+
+
+@override
+
+Widget build(BuildContext context) {
+
+return MaterialApp(
+
+home: Scaffold(
+
+backgroundColor: Colors.deepPurple, // background color
+
+body: const Center(
+
+child: Text(
+
+'Hello SHANMUGATHAI',
+
+style: TextStyle(
+
+color: Colors.white, // text color
+
+fontSize: 28, // text size
+
+fontWeight: FontWeight.bold, // optional
+
+),
+
+),
+
+),
+
+),
+
+);
+
+}}
